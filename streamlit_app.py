@@ -67,21 +67,120 @@ SCENARIO_NOTE = (
 THEME_CSS = """
 <style>
     .stApp {
-        background: linear-gradient(180deg, #ffffff 0%, #f6faff 100%);
+        background: #f7fbff;
         color: #0f172a;
     }
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f8fbff 0%, #edf5ff 100%);
+
+    .block-container {
+        padding-top: 2rem;
+        padding-left: 3rem;
+        padding-right: 3rem;
+        padding-bottom: 2rem;
+        max-width: 1500px;
     }
+
+    [data-testid="stSidebar"] {
+        background: #eef5fb;
+    }
+
     [data-testid="stMetric"] {
         background: #ffffff;
-        border: 1px solid #d8e7fb;
-        border-radius: 14px;
-        padding: 0.8rem 1rem;
-        box-shadow: 0 8px 24px rgba(15, 76, 129, 0.06);
+        border: 1px solid #cfe3f8;
+        border-radius: 12px;
+        padding: 14px 18px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
     }
-    h1, h2, h3 {
-        color: #123a72;
+
+    [data-testid="stMetricLabel"] {
+        color: #334155;
+        font-weight: 700;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #0f172a;
+        font-size: 1.35rem;
+        font-weight: 800;
+    }
+
+    h1 {
+        color: #0f172a;
+        font-size: 2.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    h2, h3 {
+        color: #0f172a;
+    }
+
+    .stCaption {
+        color: #64748b;
+    }
+
+    /* Sidebar labels */
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] p {
+        color: #0f172a !important;
+    }
+
+    /* Checkbox labels */
+    .stCheckbox label {
+        color: #0f172a !important;
+        font-weight: 500;
+    }
+
+    /* Selectbox / slider / date labels */
+    .stSelectbox label,
+    .stSlider label,
+    .stDateInput label {
+        color: #0f172a !important;
+        font-weight: 600;
+    }
+
+    /* Input widgets */
+    [data-testid="stSidebar"] [data-baseweb="select"] > div,
+    [data-testid="stSidebar"] [data-baseweb="input"] > div {
+        background-color: #0f172a !important;
+        border-radius: 10px !important;
+        border: 1px solid #1e293b !important;
+    }
+
+    /* Input text */
+    [data-testid="stSidebar"] input,
+    [data-testid="stSidebar"] textarea,
+    [data-testid="stSidebar"] select,
+    [data-testid="stSidebar"] [data-baseweb="select"] *,
+    [data-testid="stSidebar"] [data-baseweb="input"] * {
+        color: #ffffff !important;
+    }
+
+    /* Disabled widget text */
+    [data-testid="stSidebar"] [aria-disabled="true"],
+    [data-testid="stSidebar"] [aria-disabled="true"] * {
+        color: #cbd5e1 !important;
+    }
+
+    /* Slider numbers */
+    .stSlider span {
+        color: #0f172a !important;
+    }
+
+    /* Dataframe */
+    [data-testid="stDataFrame"] {
+        border: 1px solid #dbe7f3;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    /* Expander */
+    .streamlit-expanderHeader {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    /* Plot spacing */
+    .js-plotly-plot {
+        margin-top: -10px;
     }
 </style>
 """
@@ -605,7 +704,7 @@ def main() -> None:
     realized_vol_display, realized_vol_note = build_realized_vol_display(metric_map)
     synthetic_nodes_present = None if observed_nodes.empty else bool(observed_nodes["is_synthetic"].fillna(False).astype(bool).any())
 
-    top_cols = st.columns([1, 1, 1, 1, 1, 1.35])
+    top_cols = st.columns(5)
     top_cols[0].metric("Front price", format_value(displayed_front, config.unit))
     top_cols[1].metric("Back price", format_value(displayed_back, config.unit))
     top_cols[2].metric("Term structure", compute_term_structure(displayed_front, displayed_back))
@@ -614,7 +713,7 @@ def main() -> None:
         st.metric("Realized vol", realized_vol_display)
         if realized_vol_note:
             st.caption(realized_vol_note)
-    with top_cols[5]:
+    with st.expander("Curve controls", expanded=False):
         quality_panel(metric_map, synthetic_nodes_present)
 
     driver_name = method_driver["driver_name"].iloc[0] if not method_driver.empty else ""
@@ -778,18 +877,19 @@ def main() -> None:
         template="plotly_white",
         paper_bgcolor="#ffffff",
         plot_bgcolor="#ffffff",
-        height=650,
-        margin=dict(l=20, r=20, t=20, b=20),
+        height=520,
+        margin=dict(l=20, r=20, t=55, b=35),
         hovermode="x unified",
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=1.02,
+            yanchor="top",
+            y=0.99,
             xanchor="left",
-            x=0.0,
-            bgcolor="rgba(255,255,255,0.92)",
-            bordercolor="#d8e7fb",
-            borderwidth=1,
+            x=0.01,
+            bgcolor="rgba(255,255,255,0.85)",
+            bordercolor="rgba(216,231,251,0)",
+            borderwidth=0,
+            font=dict(size=11, color="#334155"),
         ),
         xaxis=dict(title="Historical data  |  Valuation date  |  Forward curve"),
         yaxis=dict(title=config.unit, gridcolor="#dce8f7", zeroline=False),
